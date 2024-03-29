@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Processing Frontend</title>
+</head>
+<body>
+    <h1>PDF Processing Frontend</h1>
+    <input type="file" id="pdfFile" />
+    <button onclick="uploadPDF()">Upload PDF</button>
+    <br><br>
+    <input type="text" id="question" placeholder="Enter your question">
+    <button onclick="askQuestion()">Ask Question</button>
+    <p id="message"></p>
+
+    <script>
+        function uploadPDF() {
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('http://localhost:5000/upload-pdf', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').innerText = data.message;
+            })
+            .catch(error => {
+                console.error('Error uploading file:', error);
+                document.getElementById('message').innerText = 'An error occurred while uploading the file.';
+            });
+        }
+
+        function askQuestion() {
+            const question = document.getElementById('question').value;
+            fetch('http://localhost:5000/question-answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ question: question })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').innerText = 'Answer: ' + data.answer;
+            })
+            .catch(error => {
+                console.error('Error asking question:', error);
+                document.getElementById('message').innerText = 'An error occurred while asking the question.';
+            });
+        }
+    </script>
+</body>
+</html>
